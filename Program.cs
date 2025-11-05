@@ -1,6 +1,4 @@
-﻿// .NET 8 - Tek process: Console ana host + Kestrel (Minimal API + SignalR) + TCP + UDP
-// Derleme/Çalıştırma: dotnet run
-using Infision;
+﻿using Infision;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -14,6 +12,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Builder.Extensions;
 using System.Globalization;
 using Infision.Kafka;
+using Infision.MHCP;
+using Infision.MHCP.Core;
+using Infision.Configure;
+using Microsoft.Extensions.Configuration;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,18 +45,29 @@ builder.Services.Configure<Infision.Configure.NetworkSettings>(opt =>
 
 });
 
-builder.Services.AddHostedService<UdpListenerService>();
+builder.Services.AddSingleton<IDiscoveryRegistry, DiscoveryRegistry>();
+builder.Services.AddSingleton<EventRequest>();
+builder.Services.AddSingleton<EventResponse>();
+builder.Services.AddSingleton<ConnectionManager>();
+builder.Services.AddSingleton<IKafkaProducer, KafkaProducerService>();
+
+builder.Services.AddHostedService<DiscoveryService>();
+builder.Services.AddHostedService<ConnectionListenerService>();
+builder.Services.AddHostedService<ConnectionHostedService>();
 builder.Services.AddHostedService<KafkaConsumerService>();
+
+
+
+
+
+
+
+
+
+//builder.Services.AddHostedService<UdpListenerService>();
 //builder.Services.AddHostedService<Inticators>();
 
 
-
-
-
-builder.Services.AddSingleton<IKafkaProducer, KafkaProducerService>();
-builder.Services.AddSingleton<IDiscoveryRegistry, DiscoveryRegistry>();
-
-Infision.HP60.Lissss();
 
 var app = builder.Build();
 

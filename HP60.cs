@@ -1,6 +1,8 @@
 ﻿
 using Infision;
 using Infision.MHCP;
+using Infision.MHCP.Proto;
+using Infision.MHCP.Types;
 using System;
 using System.IO;
 using System.Net;
@@ -37,34 +39,34 @@ public class HP60
 
             using var stream = client.GetStream();
 
-            // 1) Heartbeat (257) REQUEST
-            var hbPayload = new HeartbeatCycleRequest { HeartbeatExpirationPeriodInSeconds = 5 }.ToByteArray();
-            var hbHeader = new ProtocolHeader
-            {
-                RouteId = 0,
-                MessageId = 257,
-                CategoryId = 2,
-                RequestResponse = RequestResponseTypeEnum.Request,
-                SequenceNumber = (uint)MhcpWire.NextSeq()
-            }.ToByteArray();
-            await stream.WriteAsync(MhcpWire.Build(hbHeader, hbPayload), ct);
+            //// 1) Heartbeat (257) REQUEST
+            //var hbPayload = new HeartbeatCycleRequest { HeartbeatExpirationPeriodInSeconds = 10 }.ToByteArray();
+            //var hbHeader = new ProtocolHeader
+            //{
+            //    RouteId = 0,
+            //    MessageId = 257,
+            //    CategoryId = 2,
+            //    RequestResponse = RequestResponseTypeEnum.Request,
+            //    SequenceNumber = (uint)MhcpWire.NextSeq()
+            //}.ToByteArray();
+            //await stream.WriteAsync(MhcpWire.Build(hbHeader, hbPayload), ct);
 
-            // 3) DeviceInfo (258) REQUEST (payload yok)
-            var devHeader = new ProtocolHeader
-            {
-                RouteId = 0,
-                MessageId = 258,
-                CategoryId = 2,
-                RequestResponse = RequestResponseTypeEnum.Request,
-                SequenceNumber = (uint)MhcpWire.NextSeq()
-            }.ToByteArray();
-            await stream.WriteAsync(MhcpWire.Build(devHeader, Array.Empty<byte>()), ct);
+            //// 3) DeviceInfo (258) REQUEST (payload yok)
+            //var devHeader = new ProtocolHeader
+            //{
+            //    RouteId = 0,
+            //    MessageId = 258,
+            //    CategoryId = 2,
+            //    RequestResponse = RequestResponseTypeEnum.Request,
+            //    SequenceNumber = (uint)MhcpWire.NextSeq()
+            //}.ToByteArray();
+            //await stream.WriteAsync(MhcpWire.Build(devHeader, Array.Empty<byte>()), ct);
 
             // 4) 258 RESPONSE bekle → handshake tamam
-            (ProtocolHeader devRespHeader, byte[] devRespPayload) =
-            await MhcpClientHelpers.WaitForDeviceInfoResponseAsync(stream, TimeSpan.FromSeconds(40), ct);
+            //(ProtocolHeader devRespHeader, byte[] devRespPayload) =
+          //  await MhcpClientHelpers.WaitForDeviceInfoResponseAsync(stream, TimeSpan.FromSeconds(40), ct);
 
-            Console.WriteLine($"[+] DeviceInfo alındı. Payload uzunluğu: {devRespPayload.Length} bayt");
+         //   Console.WriteLine($"[+] DeviceInfo alındı. Payload uzunluğu: {devRespPayload.Length} bayt");
 
 
 

@@ -76,6 +76,7 @@ public sealed class UdpListenerService : BackgroundService
                 var devInfo = new DiscoveredDevice(
                    address: remoteEp.ToString(),
                    port: remoteEp.Port,       
+                   protocol: "UDP",
                    seenAtUtc: DateTimeOffset.UtcNow,
                    lastPayload: payload
                );

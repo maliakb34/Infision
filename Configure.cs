@@ -61,10 +61,10 @@ namespace Infision.Configure
 
     public sealed record NetworkSettings
     {
-        public string HttpUrl { get; set; } = "http://0.0.0.0:5000";
-        public int TcpPort { get; set; } = 26801;
-        public int UdpListenPort { get; set; } = 26800;
-        public string ServerIp { get; set; } = "192.168.1.100";
+        public string HttpUrl { get; set; } 
+        public ushort TcpPort { get; set; } 
+        public ushort UdpListenPort { get; set; } 
+        public string ServerIp { get; set; } 
 
         public int UdpBroadcastIntervalMs { get; set; } = 2000;
     }

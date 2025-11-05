@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Infision.MHCP
+namespace Infision.MHCP.Entities
 {
     public sealed class HeartbeatCycleRequest
     {
@@ -19,7 +19,7 @@ namespace Infision.MHCP
         {
             while (v >= 0x80)
             {
-                buf.Add((byte)((v & 0x7F) | 0x80));
+                buf.Add((byte)(v & 0x7F | 0x80));
                 v >>= 7;
             }
             buf.Add((byte)v);
