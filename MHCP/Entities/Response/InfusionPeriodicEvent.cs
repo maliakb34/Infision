@@ -1,7 +1,7 @@
 using Infision.MHCP.Proto;
 using System;
 
-namespace Infision.MHCP.Entities
+namespace Infision.MHCP.Entities.Response
 {
     public sealed class InfusionPeriodicEvent
     {

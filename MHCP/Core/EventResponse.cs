@@ -1,22 +1,28 @@
-using Infision.MHCP.Proto;
-using Infision.MHCP.Types;
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Infision.MHCP.Diagnostics;
+using Infision.MHCP.Entities.Response;
+using Infision.MHCP.Proto;
+using Infision.MHCP.Types;
+using Microsoft.Extensions.Logging;
 
 namespace Infision.MHCP
 {
     public sealed class EventResponse
     {
         private readonly IDiscoveryRegistry _registry;
+        private readonly ILogger<EventResponse> _logger;
 
         private readonly ConcurrentDictionary<string, HandshakeTracker> _handshakes = new();
 
-        public EventResponse(IDiscoveryRegistry registry)
+        public EventResponse(IDiscoveryRegistry registry, ILogger<EventResponse> logger)
         {
             _registry = registry;
+            _logger = logger;
         }
 
         public async Task RunAsync(DiscoveredDevice device, NetworkStream stream, CancellationToken ct = default)
@@ -47,9 +53,23 @@ namespace Infision.MHCP
                         device.HandshakeCompleted = true;
                         device.Stream = stream;
                         _registry.TryUpdate(device);
-                        if (_handshakes.TryGetValue(address, out var tracker2))
+                        _logger.LogInformation("Device info payload received from {Device}:\n{Dump}",
+                            device.Address,
+       ProtobufDumper.Dump(payload.ToArray().AsSpan()));
+                        if (_handshakes.TryGetValue(address, out var deviceTracker))
                         {
-                            tracker2.SignalDeviceInfo();
+                            deviceTracker.SignalDeviceInfo();
+                        }
+                        break;
+
+                    case var msg when msg == MhcpConstants.EVENT_INFUSION_CYCLE:
+                        try
+                        {
+                            var infusionEvent = InfusionPeriodicEvent.Parse(payload.ToArray());
+                            _logger.LogInformation(JsonSerializer.Serialize(infusionEvent));  }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to parse infusion cycle payload from {Device}", device.Address);
                         }
                         break;
 

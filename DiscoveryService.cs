@@ -64,7 +64,6 @@ namespace Infision
                         dev.OnPacketArrival += OnPacketArrival;
                         dev.StartCapture();
                         devices.Add(dev);
-                        _logger.LogInformation("DiscoveryService sniffing on {Device}", dev.Description ?? dev.Name);
                     }
                     catch (Exception ex)
                     {

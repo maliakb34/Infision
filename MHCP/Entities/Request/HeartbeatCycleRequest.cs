@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Infision.MHCP.Entities
+namespace Infision.MHCP.Entities.Request
 {
     public sealed class HeartbeatCycleRequest
     {

@@ -2,21 +2,25 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Infision;
 using Infision.MHCP.Entities;
 using Infision.MHCP.Proto;
 using Infision.MHCP.Types;
+using Infision.MHCP.Entities;
+using Microsoft.Extensions.Logging;
+using Infision.MHCP.Entities.Request;
 
 
-namespace Infision.MHCP.Core
+namespace Infision.MHCP
 {
     public sealed class EventRequest
     {
         private readonly int _defaultHeartbeatSeconds;
+        private readonly ILogger<EventRequest>? _logger;
 
-        public EventRequest(int defaultHeartbeatSeconds = 5)
+        public EventRequest(int defaultHeartbeatSeconds = 2, ILogger<EventRequest>? logger = null)
         {
             _defaultHeartbeatSeconds = defaultHeartbeatSeconds;
+            _logger = logger;
         }
 
         public Task SendAsync(NetworkStream stream, int messageId, CancellationToken ct = default)
@@ -41,6 +45,8 @@ namespace Infision.MHCP.Core
 
         private ReadOnlyMemory<byte> BuildPayload(int messageId)
         {
+            _logger?.LogDebug("Sending request messageId={MessageId}", messageId);
+
             switch (messageId)
             {
                 case MhcpConstants.REQ_HEART_FREQ_SET:
@@ -49,10 +55,20 @@ namespace Infision.MHCP.Core
                         HeartbeatExpirationPeriodInSeconds = (uint)_defaultHeartbeatSeconds
                     }.ToByteArray();
 
+                case MhcpConstants.REQ_DEVICE_INFO:
+                case MhcpConstants.REQ_STATION_INFO:
+                case MhcpConstants.REQ_PATIENT_INFO:
+                case MhcpConstants.REQ_PERIODIC_INFUSION_INTERVAL:
+                    return new PeriodicInfusionIntervalRequest
+                    {
+                        IntervalSeconds = 1
+                    }.ToByteArray();
+
+               
+
                 default:
                     return ReadOnlyMemory<byte>.Empty;
             }
         }
     }
 }
-

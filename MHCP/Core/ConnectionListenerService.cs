@@ -48,7 +48,6 @@ namespace Infision.MHCP
 
             _listener = new TcpListener(listenIp, listenPort);
             _listener.Start();
-            _logger.LogInformation("Connection listener started on {Address}:{Port}", listenIp, listenPort);
 
             try
             {

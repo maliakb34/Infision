@@ -80,7 +80,7 @@ namespace Infision.MHCP
                     return;
                 }
                 shouldCleanup = true;
-
+                //BURAYA BÝRDEN FAZLA KEZ GÝRMESSÝNE BAKILACAK//
                 _responseProcessor.BeginHandshakeTracking(address);
 
                 await _requestSender.SendAsync(stream, MhcpConstants.REQ_HEART_FREQ_SET, parentToken).ConfigureAwait(false);
@@ -88,6 +88,9 @@ namespace Infision.MHCP
 
                 await _requestSender.SendAsync(stream, MhcpConstants.REQ_DEVICE_INFO, parentToken).ConfigureAwait(false);
                 await _responseProcessor.WaitForDeviceInfoAsync(address, _handshakeTimeout, parentToken).ConfigureAwait(false);
+ 
+                await _requestSender.SendAsync(stream, MhcpConstants.REQ_PERIODIC_INFUSION_INTERVAL, parentToken).ConfigureAwait(false);
+
 
                 await responseTask.ConfigureAwait(false);
             }
