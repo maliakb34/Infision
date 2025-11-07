@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 
@@ -32,7 +33,12 @@ public sealed class DiscoveredDevice
 public interface IDiscoveryRegistry
 {
     bool TryPublish(DiscoveredDevice dev);
+<<<<<<< HEAD
     bool TryUpdate(DiscoveredDevice dev);
+=======
+    ValueTask PublishAsync(DiscoveredDevice dev, CancellationToken ct = default);
+    DiscoveredDevice? TryUpdate(DiscoveredDevice dev);
+>>>>>>> alarm dataları yapıldı
     bool TryRemove(string address, out DiscoveredDevice? removed);
     bool TryGet(string address, out DiscoveredDevice? device);
 }
@@ -49,18 +55,57 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
     {
         var key = Normalize(dev.Address);
         var added = _devices.TryAdd(key, dev);
+<<<<<<< HEAD
         _devices[key] = dev; // snapshot güncel
         return added;
+=======
+
+        _devices[key] = dev; // keep freshest snapshot
+
+        if (!added)
+        {
+            // already known device -> no new entry
+            return true;
+        }
+
+        if (!ShouldEmit(key))
+            return true;
+
+        return _channel.Writer.TryWrite(dev);
     }
 
-    public bool TryUpdate(DiscoveredDevice dev)
+    public async ValueTask PublishAsync(DiscoveredDevice dev, CancellationToken ct = default)
+    {
+        var key = Normalize(dev.Address);
+        var added = _devices.TryAdd(key, dev);
+
+        _devices[key] = dev;
+
+        if (!added)
+        {
+            return;
+        }
+
+        if (!ShouldEmit(key))
+            return;
+
+        await _channel.Writer.WriteAsync(dev, ct);
+>>>>>>> alarm dataları yapıldı
+    }
+
+    public DiscoveredDevice? TryUpdate(DiscoveredDevice dev)
     {
         var key = Normalize(dev.Address);
         if (!_devices.ContainsKey(key))
-            return false;
+            return null;
 
         _devices[key] = dev;
+<<<<<<< HEAD
         return true;
+=======
+        _lastSeen[key] = DateTimeOffset.UtcNow;
+        return dev;
+>>>>>>> alarm dataları yapıldı
     }
 
     public bool TryRemove(string address, out DiscoveredDevice? removed)
@@ -75,6 +120,20 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
         return _devices.TryGetValue(key, out device);
     }
 
+<<<<<<< HEAD
+=======
+    private bool ShouldEmit(string key)
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        if (_lastSeen.TryGetValue(key, out var prev) && (now - prev) < _debounce)
+            return false;
+
+        _lastSeen[key] = now;
+        return true;
+    }
+
+>>>>>>> alarm dataları yapıldı
     private static string Normalize(string address)
     {
         if (string.IsNullOrWhiteSpace(address))
@@ -82,9 +141,16 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
 
         var trimmed = address.Trim();
 
+<<<<<<< HEAD
         if (TryNormalizeIpLiteral(trimmed, out var normalized))
             return normalized;
+=======
+        // If it's already a pure IP string
+        if (IPAddress.TryParse(trimmed, out var ip))
+            return ip.ToString();
+>>>>>>> alarm dataları yapıldı
 
+        // IPv6 with brackets e.g. [fe80::1%12]:9900
         if (trimmed.StartsWith("[", StringComparison.Ordinal))
         {
             int end = trimmed.IndexOf(']');
@@ -96,16 +162,24 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
             }
         }
 
+        // Try to split host:port (IPv4)
         int lastColon = trimmed.LastIndexOf(':');
         if (lastColon > 0)
         {
+<<<<<<< HEAD
             var hostPart = trimmed[..lastColon];
             if (TryNormalizeIpLiteral(hostPart, out normalized))
                 return normalized;
+=======
+            var hostPart = trimmed.Substring(0, lastColon);
+            if (IPAddress.TryParse(hostPart, out ip))
+                return ip.ToString();
+>>>>>>> alarm dataları yapıldı
         }
 
         return trimmed;
     }
+<<<<<<< HEAD
 
     private static bool TryNormalizeIpLiteral(string candidate, out string normalized)
     {
@@ -124,4 +198,6 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
         normalized = string.Empty;
         return false;
     }
+=======
+>>>>>>> alarm dataları yapıldı
 }

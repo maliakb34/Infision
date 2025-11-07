@@ -16,13 +16,16 @@ namespace Infision.MHCP
     {
         private readonly IDiscoveryRegistry _registry;
         private readonly ILogger<EventResponse> _logger;
-
+        private readonly EventRequest _requestSender;
         private readonly ConcurrentDictionary<string, HandshakeTracker> _handshakes = new();
 
-        public EventResponse(IDiscoveryRegistry registry, ILogger<EventResponse> logger)
+        public EventResponse(IDiscoveryRegistry registry, ILogger<EventResponse> logger, EventRequest requestSender)
         {
             _registry = registry;
+            _requestSender = requestSender;
+
             _logger = logger;
+            _requestSender = requestSender;
         }
 
         public async Task RunAsync(DiscoveredDevice device, NetworkStream stream, CancellationToken ct = default)
@@ -32,19 +35,24 @@ namespace Infision.MHCP
             {
                 var (headerBytes, payload) = await MhcpWire.ReadFrameAsync(stream, ct).ConfigureAwait(false);
                 var header = ProtocolHeader.Parse(headerBytes);
+<<<<<<< HEAD
                 if(header.MessageId>1)
                 _logger.LogInformation(device.Address.ToString()+"   "+header.MessageId.ToString());
+=======
+                _logger.LogInformation(header.MessageId.ToString());
+
+>>>>>>> alarm dataları yapıldı
                 switch (header.MessageId)
                 {
                     case var msg when msg == MhcpConstants.REQ_HEART && header.RequestResponse == RequestResponseTypeEnum.Request:
-                        await ReplyHeartbeatAsync(stream, header, ct).ConfigureAwait(false);
+                        await ReplyEmptyAsync(stream, header, ct).ConfigureAwait(false);
                         break;
 
                     case var msg when msg == MhcpConstants.REQ_HEART_FREQ_SET && header.RequestResponse == RequestResponseTypeEnum.Response:
                         device.HeartbeatAcknowledged = true;
                         device.HandshakeCompleted = true;
                         device.Stream = stream;
-                        _registry.TryUpdate(device);
+                        device = _registry.TryUpdate(device) ?? device;
                         if (_handshakes.TryGetValue(address, out var tracker))
                         {
                             tracker.SignalHeartbeat();
@@ -54,10 +62,31 @@ namespace Infision.MHCP
                     case var msg when msg == MhcpConstants.REQ_DEVICE_INFO && header.RequestResponse == RequestResponseTypeEnum.Response:
                         device.HandshakeCompleted = true;
                         device.Stream = stream;
+<<<<<<< HEAD
                         _registry.TryUpdate(device);
                         _logger.LogInformation("Device info payload received from {Device}:\n{Dump}",
                             device.Address,
                           ProtobufDumper.Dump(payload.ToArray().AsSpan()));
+=======
+                        device = _registry.TryUpdate(device) ?? device;
+                        try
+                        {
+                            var info = DeviceInfoResponse.Parse(new ReadOnlySpan<byte>(payload));
+                            _logger.LogInformation("Device info from {Device}: SN={Sn}, Model={Model}, ProtoVer={ProtoVer}, Boot={Boot}, Resource={Resource}",
+                                device.Address,
+                                info.DeviceId.SerialNumber,
+                                info.DeviceId.ModelNumber,
+                                info.ProtocolVersion,
+                                info.BootLoaderVersion,
+                                info.ResourceVersion);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to parse device info payload from {Device}. Dump:\n{Dump}",
+                                device.Address,
+                                ProtobufDumper.Dump(new ReadOnlySpan<byte>(payload)));
+                        }
+>>>>>>> alarm dataları yapıldı
                         if (_handshakes.TryGetValue(address, out var deviceTracker))
                         {
                             deviceTracker.SignalDeviceInfo();
@@ -68,13 +97,27 @@ namespace Infision.MHCP
                         try
                         {
                             var infusionEvent = InfusionPeriodicEvent.Parse(payload.ToArray());
-                            _logger.LogInformation(JsonSerializer.Serialize(infusionEvent));  }
+                            _logger.LogInformation("Infusion cycle from {Device}: SN={Sn}, rate={Rate}, infused={Infused}",
+                                device.Address,
+                                infusionEvent.DeviceSerialNumber,
+                                infusionEvent.Delta.Rate,
+                                infusionEvent.Delta.CumulantInfused);
+                        }
                         catch (Exception ex)
                         {
                             _logger.LogWarning(ex, "Failed to parse infusion cycle payload from {Device}", device.Address);
                         }
                         break;
         
+
+                    case var msg when msg == MhcpConstants.REQ_ALARM_INFO || msg == MhcpConstants.EVENT_ALARM&& header.RequestResponse == RequestResponseTypeEnum.Response:
+                        var alarm = AlarmEventMessage.Parse(payload.ToArray());
+                        _logger.LogInformation(JsonSerializer.Serialize(alarm));
+                        if (device.HandshakeCompleted)
+                        {
+                            await _requestSender.SendAsync(stream, MhcpConstants.REQ_ALARM_INFO, default).ConfigureAwait(false);
+                        }
+                        break;
 
                     default:
                         // Future: add more cases (patient info, events, etc.)
@@ -112,7 +155,35 @@ namespace Infision.MHCP
             return tracker.WaitForDeviceInfoAsync(timeout, ct);
         }
 
-        private static async Task ReplyHeartbeatAsync(NetworkStream stream, ProtocolHeader requestHeader, CancellationToken ct)
+        private async Task HandleAlarmAsync(ProtocolHeader header, byte[] payload, DiscoveredDevice device, NetworkStream stream, CancellationToken ct)
+        {
+            try
+            {
+                var alarmEvent = AlarmEventMessage.Parse(new ReadOnlySpan<byte>(payload));
+                foreach (var alarm in alarmEvent.Alarms)
+                {
+                    _logger.LogWarning("Alarm from {Device} (SN={Sn}) id={Id} level={Level} state={State}",
+                        device.Address,
+                        alarmEvent.DeviceId.SerialNumber,
+                        alarm.Id,
+                        alarm.Level,
+                        alarm.State);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to parse alarm payload from {Device}. Dump:\n{Dump}",
+                    device.Address,
+                    ProtobufDumper.Dump(new ReadOnlySpan<byte>(payload)));
+            }
+
+            if (header.RequestResponse == RequestResponseTypeEnum.Request)
+            {
+                await ReplyEmptyAsync(stream, header, ct).ConfigureAwait(false);
+            }
+        }
+
+        private static async Task ReplyEmptyAsync(NetworkStream stream, ProtocolHeader requestHeader, CancellationToken ct)
         {
             var responseHeader = new ProtocolHeader
             {

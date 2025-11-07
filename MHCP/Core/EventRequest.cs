@@ -17,7 +17,7 @@ namespace Infision.MHCP
         private readonly int _defaultHeartbeatSeconds;
         private readonly ILogger<EventRequest>? _logger;
 
-        public EventRequest(int defaultHeartbeatSeconds = 2, ILogger<EventRequest>? logger = null)
+        public EventRequest(int defaultHeartbeatSeconds = 1, ILogger<EventRequest>? logger = null)
         {
             _defaultHeartbeatSeconds = defaultHeartbeatSeconds;
             _logger = logger;
