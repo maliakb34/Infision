@@ -34,7 +34,6 @@ public class KafkaConsumerService : BackgroundService
             // Atama anında her partisyonu "son" (Offset.End) konumuna getir
             .SetPartitionsAssignedHandler((c, parts) =>
             {
-                _log.LogInformation("Assigned: {Parts}", string.Join(",", parts));
                 var seekEnd = parts.Select(p => new TopicPartitionOffset(p, Offset.End)).ToList();
                 return seekEnd; // ->   
             })

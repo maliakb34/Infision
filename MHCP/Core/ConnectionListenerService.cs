@@ -45,6 +45,7 @@ namespace Infision.MHCP
             }
 
             var listenPort = _opt.TcpPort > 0 ? _opt.TcpPort  : 9900;
+           
 
             _listener = new TcpListener(listenIp, listenPort);
             _listener.Start();

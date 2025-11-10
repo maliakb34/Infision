@@ -32,7 +32,8 @@ namespace Infision.MHCP
             {
                 var (headerBytes, payload) = await MhcpWire.ReadFrameAsync(stream, ct).ConfigureAwait(false);
                 var header = ProtocolHeader.Parse(headerBytes);
-
+                if(header.MessageId>1)
+                _logger.LogInformation(device.Address.ToString()+"   "+header.MessageId.ToString());
                 switch (header.MessageId)
                 {
                     case var msg when msg == MhcpConstants.REQ_HEART && header.RequestResponse == RequestResponseTypeEnum.Request:
@@ -41,6 +42,7 @@ namespace Infision.MHCP
 
                     case var msg when msg == MhcpConstants.REQ_HEART_FREQ_SET && header.RequestResponse == RequestResponseTypeEnum.Response:
                         device.HeartbeatAcknowledged = true;
+                        device.HandshakeCompleted = true;
                         device.Stream = stream;
                         _registry.TryUpdate(device);
                         if (_handshakes.TryGetValue(address, out var tracker))
@@ -55,7 +57,7 @@ namespace Infision.MHCP
                         _registry.TryUpdate(device);
                         _logger.LogInformation("Device info payload received from {Device}:\n{Dump}",
                             device.Address,
-       ProtobufDumper.Dump(payload.ToArray().AsSpan()));
+                          ProtobufDumper.Dump(payload.ToArray().AsSpan()));
                         if (_handshakes.TryGetValue(address, out var deviceTracker))
                         {
                             deviceTracker.SignalDeviceInfo();
@@ -72,6 +74,7 @@ namespace Infision.MHCP
                             _logger.LogWarning(ex, "Failed to parse infusion cycle payload from {Device}", device.Address);
                         }
                         break;
+        
 
                     default:
                         // Future: add more cases (patient info, events, etc.)

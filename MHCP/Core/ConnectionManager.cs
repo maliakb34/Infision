@@ -1,4 +1,4 @@
-using Infision.MHCP.Core;
+ï»¿using Infision.MHCP.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Net;
@@ -51,8 +51,7 @@ namespace Infision.MHCP
             bool shouldCleanup = false;
             var client = existingClient ?? new TcpClient();
 
-            try
-            {
+         
                 if (device.HandshakeCompleted)
                     return;
 
@@ -80,32 +79,25 @@ namespace Infision.MHCP
                     return;
                 }
                 shouldCleanup = true;
-                //BURAYA BÝRDEN FAZLA KEZ GÝRMESSÝNE BAKILACAK//
+                //BURAYA BÄ°RDEN FAZLA KEZ GÄ°RMESSÄ°NE BAKILACAK//
                 _responseProcessor.BeginHandshakeTracking(address);
 
                 await _requestSender.SendAsync(stream, MhcpConstants.REQ_HEART_FREQ_SET, parentToken).ConfigureAwait(false);
                 await _responseProcessor.WaitForHeartbeatAsync(address, _handshakeTimeout, parentToken).ConfigureAwait(false);
-
-                await _requestSender.SendAsync(stream, MhcpConstants.REQ_DEVICE_INFO, parentToken).ConfigureAwait(false);
-                await _responseProcessor.WaitForDeviceInfoAsync(address, _handshakeTimeout, parentToken).ConfigureAwait(false);
- 
+        
+             
+         
                 await _requestSender.SendAsync(stream, MhcpConstants.REQ_PERIODIC_INFUSION_INTERVAL, parentToken).ConfigureAwait(false);
 
 
-                await responseTask.ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                // TODO: add logging hook if required
-            }
-            finally
-            {
-                if (shouldCleanup)
-                {
-                    _responseProcessor.EndHandshakeTracking(address);
-                    await CleanupAsync(address).ConfigureAwait(false);
-                }
-            }
+            await _requestSender.SendAsync(stream, MhcpConstants.REQ_DEVICE_INFO, parentToken).ConfigureAwait(false);
+            await _responseProcessor.WaitForDeviceInfoAsync(address, _handshakeTimeout, parentToken).ConfigureAwait(false);
+
+
+            await responseTask.ConfigureAwait(false);
+            
+     
+         
         }
 
         private async Task CleanupAsync(string address)

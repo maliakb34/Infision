@@ -60,8 +60,8 @@ namespace Infision.MHCP
                 case MhcpConstants.REQ_PATIENT_INFO:
                 case MhcpConstants.REQ_PERIODIC_INFUSION_INTERVAL:
                     return new PeriodicInfusionIntervalRequest
-                    {
-                        IntervalSeconds = 1
+                    { 
+                        IntervalSeconds = 3
                     }.ToByteArray();
 
                

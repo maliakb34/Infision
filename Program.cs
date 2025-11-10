@@ -17,6 +17,7 @@ using Infision.MHCP.Core;
 using Infision.Configure;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @".
 
 //Infision.Configure.RootSetting.Roots.AppSettings.DBRedisConnection = "127.0.0.1,abortConnect=false,syncTimeout=50000";
 
-Infision.Configure.RootSetting.Roots = Newtonsoft.Json.JsonConvert.DeserializeObject<Infision.Configure.Root>(File.ReadAllText(projectRoot + "appsettings.json"));
+Infision.Configure.RootSetting.Roots = JsonSerializer.Deserialize<Infision.Configure.Root>(File.ReadAllText(projectRoot + "appsettings.json"));
 Infision.Configure.RootSetting.Roots.AppSettings.StoragePath = projectRoot;
 
 
@@ -51,7 +52,7 @@ builder.Services.AddSingleton<EventResponse>();
 builder.Services.AddSingleton<ConnectionManager>();
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducerService>();
 
-builder.Services.AddHostedService<DiscoveryService>();
+//builder.Services.AddHostedService<DiscoveryService>();
 builder.Services.AddHostedService<ConnectionListenerService>();
 builder.Services.AddHostedService<ConnectionHostedService>();
 builder.Services.AddHostedService<KafkaConsumerService>();
@@ -64,7 +65,7 @@ builder.Services.AddHostedService<KafkaConsumerService>();
 
 
 
-//builder.Services.AddHostedService<UdpListenerService>();
+builder.Services.AddHostedService<UdpListenerService>();
 //builder.Services.AddHostedService<Inticators>();
 
 
