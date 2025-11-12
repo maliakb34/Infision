@@ -18,6 +18,8 @@ using Infision.Configure;
 using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using System.Text.Json;
+using Infision.API;
+using Infision.API.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +39,12 @@ builder.Services.AddSignalR(); // Add services before Build()
 
 builder.Services.AddTransient<MyHubContext>();
 
-
+// 1) SERVISLER (Build'tan önce)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(o =>
+{
+    o.SwaggerDoc("v1", new() { Title = "Infision API", Version = "v1" });
+});
 
 
 builder.Services.Configure<Infision.Configure.NetworkSettings>(opt =>
@@ -80,27 +87,28 @@ app.MapHub<MyHub>("/myhub");
 
 
 
-// Basit API
-app.MapGet("/health", () => new { status = "ok", time = DateTimeOffset.UtcNow });
-app.MapPost("/api/echo", async (HttpContext ctx) =>
+app.UseSwagger(c =>
 {
-    using var reader = new StreamReader(ctx.Request.Body, Encoding.UTF8);
-    var body = await reader.ReadToEndAsync();
-    return Results.Ok(new { you_sent = body });
+    c.RouteTemplate = "swagger/{documentName}/swagger.json";
 });
+
+// EN KRİTİK NOKTA: SwaggerEndpoint'e GÖRELİ yol ver
+// (leading slash YOK) => UI hangi path'te olursa olsun doğru json'ı çeker
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = "swagger";                     // http://host:port/swagger
+    c.SwaggerEndpoint("v1/swagger.json", "Infision API v1");
+});
+
+// Test endpoint
+app.Endpointlist();
 
 
 // Kestrel'i console’dan istediğimiz URL’ye bağlarız
-var optVal = app.Services.GetRequiredService<IOptions<Infision.Configure.NetworkSettings>>().Value;
+var optVal = Infision.Configure.RootSetting.Roots.AppSettings.NetworkSetting;
 app.Urls.Add(optVal.HttpUrl);
 
 // Bu satırdan sonra process hem web’i hem background servisleri **aynı anda** koşturur
 await app.RunAsync();
 
 //Scaffold - DbContext "Host=localhost;Port=5432;Database=infisiondb;Username=appuser;Password=app123" Npgsql.EntityFrameworkCore.PostgreSQL - OutputDir "EF\Models" - ContextDir "EF" - Context "InfisionDbContext" - DataAnnotations - UseDatabaseNames - Schemas "public" - Force - Project Infision
-
-
-
-
-
-

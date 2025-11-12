@@ -22,4 +22,3 @@ namespace Infision.MHCP.Core
         }
     }
 }
-

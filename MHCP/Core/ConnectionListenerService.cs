@@ -16,7 +16,7 @@ namespace Infision.MHCP
         private readonly ILogger<ConnectionListenerService> _logger;
         private readonly ConnectionManager _manager;
         private readonly IDiscoveryRegistry _registry;
-   
+
         private TcpListener? _listener;
         private readonly NetworkSettings _opt;
         public ConnectionListenerService(
@@ -32,7 +32,7 @@ namespace Infision.MHCP
 
             _opt = RootSetting.Roots.AppSettings.NetworkSetting;
             // Ensure `ServerIp` is parsed correctly if provided.
-        
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,11 +44,11 @@ namespace Infision.MHCP
                 listenIp = parsed;
             }
 
-            var listenPort = _opt.TcpPort > 0 ? _opt.TcpPort  : 9900;
-           
+            var listenPort = _opt.TcpPort > 0 ? _opt.TcpPort : 9900;
+
 
             _listener = new TcpListener(listenIp, listenPort);
-          //  _listener.Start();
+            //  _listener.Start();
 
             try
             {
@@ -117,4 +117,3 @@ namespace Infision.MHCP
         }
     }
 }
-
