@@ -97,6 +97,7 @@ app.Urls.Add(optVal.HttpUrl);
 // Bu satırdan sonra process hem web’i hem background servisleri **aynı anda** koşturur
 await app.RunAsync();
 
+//Scaffold - DbContext "Host=localhost;Port=5432;Database=infisiondb;Username=appuser;Password=app123" Npgsql.EntityFrameworkCore.PostgreSQL - OutputDir "EF\Models" - ContextDir "EF" - Context "InfisionDbContext" - DataAnnotations - UseDatabaseNames - Schemas "public" - Force - Project Infision
 
 
 

@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36408.4 d17.14
+VisualStudioVersion = 17.14.36408.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infision", "Infision.csproj", "{75BC468E-D7F8-43C4-937D-A4F78F2AAF1B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{6C540892-9597-4BC0-985C-7061A123CE63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{87159E0E-82BC-4910-9844-7EEDF7EB49A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +21,17 @@ Global
 		{75BC468E-D7F8-43C4-937D-A4F78F2AAF1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75BC468E-D7F8-43C4-937D-A4F78F2AAF1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75BC468E-D7F8-43C4-937D-A4F78F2AAF1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87159E0E-82BC-4910-9844-7EEDF7EB49A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87159E0E-82BC-4910-9844-7EEDF7EB49A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87159E0E-82BC-4910-9844-7EEDF7EB49A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87159E0E-82BC-4910-9844-7EEDF7EB49A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{75BC468E-D7F8-43C4-937D-A4F78F2AAF1B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{87159E0E-82BC-4910-9844-7EEDF7EB49A6} = {6C540892-9597-4BC0-985C-7061A123CE63}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F109193F-B1D9-46DC-8A62-995EB0B67CA6}
