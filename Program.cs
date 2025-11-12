@@ -46,15 +46,15 @@ builder.Services.Configure<Infision.Configure.NetworkSettings>(opt =>
 
 });
 
-builder.Services.AddSingleton<IDiscoveryRegistry, DiscoveryRegistry>();
-builder.Services.AddSingleton<EventRequest>();
-builder.Services.AddSingleton<EventResponse>();
-builder.Services.AddSingleton<ConnectionManager>();
+//builder.Services.AddSingleton<IDiscoveryRegistry, DiscoveryRegistry>();
+//builder.Services.AddSingleton<EventRequest>();
+//builder.Services.AddSingleton<EventResponse>();
+//builder.Services.AddSingleton<ConnectionManager>();
 builder.Services.AddSingleton<IKafkaProducer, KafkaProducerService>();
 
 //builder.Services.AddHostedService<DiscoveryService>();
-builder.Services.AddHostedService<ConnectionListenerService>();
-builder.Services.AddHostedService<ConnectionHostedService>();
+//builder.Services.AddHostedService<ConnectionListenerService>();
+//builder.Services.AddHostedService<ConnectionHostedService>();
 builder.Services.AddHostedService<KafkaConsumerService>();
 
 
@@ -65,7 +65,7 @@ builder.Services.AddHostedService<KafkaConsumerService>();
 
 
 
-builder.Services.AddHostedService<UdpListenerService>();
+//builder.Services.AddHostedService<UdpListenerService>();
 //builder.Services.AddHostedService<Inticators>();
 
 

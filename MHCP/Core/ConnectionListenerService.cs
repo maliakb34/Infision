@@ -48,7 +48,7 @@ namespace Infision.MHCP
            
 
             _listener = new TcpListener(listenIp, listenPort);
-            _listener.Start();
+          //  _listener.Start();
 
             try
             {
