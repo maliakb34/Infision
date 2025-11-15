@@ -8,14 +8,14 @@ namespace Infision.MHCP
     /// </summary>
     public sealed class MhcpMessageContext
     {
-        public MhcpMessageContext(DiscoveredDevice device, NetworkStream stream, ILogger? logger = null)
+        public MhcpMessageContext(RegisteredDevices device, NetworkStream stream, ILogger? logger = null)
         {
             Device = device;
             Stream = stream;
             Logger = logger;
         }
 
-        public DiscoveredDevice Device { get; }
+        public RegisteredDevices Device { get; }
 
         public NetworkStream Stream { get; }
 

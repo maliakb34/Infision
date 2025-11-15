@@ -23,7 +23,14 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 <ItemGroup>
+  <Compile Remove="HP60.cs" />
+  <Compile Remove="MhcpPacketBuilder.cs" />
+  <Compile Remove="MP60RealTimeData.cs" />
   <Compile Remove="Properties\AssemblyInfo.cs" />
+</ItemGroup>
+<ItemGroup>
+  <None Remove=".gitattributes" />
+  <None Remove=".gitignore" />
 </ItemGroup>
   <ItemGroup>
 

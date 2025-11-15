@@ -4,9 +4,12 @@ using System.Net.Sockets;
 
 namespace Infision;
 
-public sealed class DiscoveredDevice
+/// <summary>
+/// * Cihazların kayıt işlemlerini yürütür.
+/// </summary>
+public sealed class RegisteredDevices
 {
-    public DiscoveredDevice(string address, int port, DateTimeOffset seenAtUtc, string protocol, byte[] lastPayload)
+    public RegisteredDevices(string address, int port, DateTimeOffset seenAtUtc, string protocol, byte[] lastPayload)
     {
         Address = address ?? throw new ArgumentNullException(nameof(address));
         Port = port;
@@ -15,7 +18,7 @@ public sealed class DiscoveredDevice
         LastPayload = lastPayload is { Length: > 0 } ? (byte[])lastPayload.Clone() : Array.Empty<byte>();
     }
 
-    public static DiscoveredDevice From(IPAddress address, int port, DateTimeOffset seenAtUtc, string protocol, ReadOnlySpan<byte> payload)
+    public static RegisteredDevices From(IPAddress address, int port, DateTimeOffset seenAtUtc, string protocol, ReadOnlySpan<byte> payload)
         => new(address.ToString(), port, seenAtUtc, protocol, payload.ToArray());
 
     public string Address { get; init; } = string.Empty;
@@ -29,23 +32,15 @@ public sealed class DiscoveredDevice
     public NetworkStream? Stream { get; set; }
 }
 
-public interface IDiscoveryRegistry
+public sealed class RegistryDevices
 {
-    bool TryPublish(DiscoveredDevice dev);
-    bool TryUpdate(DiscoveredDevice dev);
-    bool TryRemove(string address, out DiscoveredDevice? removed);
-    bool TryGet(string address, out DiscoveredDevice? device);
-}
+    private readonly ConcurrentDictionary<string, RegisteredDevices> _devices = new();
 
-public sealed class DiscoveryRegistry : IDiscoveryRegistry
-{
-    private readonly ConcurrentDictionary<string, DiscoveredDevice> _devices = new();
-
-    public DiscoveryRegistry()
+    public RegistryDevices()
     {
     }
 
-    public bool TryPublish(DiscoveredDevice dev)
+    public bool TryPublish(RegisteredDevices dev)
     {
         var key = Normalize(dev.Address);
         var added = _devices.TryAdd(key, dev);
@@ -53,7 +48,7 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
         return added;
     }
 
-    public bool TryUpdate(DiscoveredDevice dev)
+    public bool TryUpdate(RegisteredDevices dev)
     {
         var key = Normalize(dev.Address);
         if (!_devices.ContainsKey(key))
@@ -63,13 +58,13 @@ public sealed class DiscoveryRegistry : IDiscoveryRegistry
         return true;
     }
 
-    public bool TryRemove(string address, out DiscoveredDevice? removed)
+    public bool TryRemove(string address, out RegisteredDevices? removed)
     {
         var key = Normalize(address);
         return _devices.TryRemove(key, out removed);
     }
 
-    public bool TryGet(string address, out DiscoveredDevice? device)
+    public bool TryGet(string address, out RegisteredDevices? device)
     {
         var key = Normalize(address);
         return _devices.TryGetValue(key, out device);

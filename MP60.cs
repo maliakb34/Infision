@@ -40,7 +40,7 @@ namespace Infision
             catch (Exception ex) { Console.WriteLine("refHex parse hatası: " + ex.Message); return 1; }
 
             // hedef cihaz (kendi ağına göre değiştir)
-            string deviceIp = "192.168.1.40";
+            string deviceIp = "192.168.1.30";
             int devicePort = 26800;
 
             // yazılacak değerler (burayı değiştir)
@@ -48,8 +48,8 @@ namespace Infision
             string deptToSet = "ICU";            // BÖLÜM (ASCII, max L_DEPT)
             string roomToSet = "f";           // O_ROOM (ASCII, max L_ROOM) - isteğe bağlı
             string bedToSet = "5";              // YATAK NO (ASCII, max L_BED)
-            string nameToSet = "de";    // NAME (ASCII, max L_NAME)
-            int ageToSet = 33;               // AGE (numeric byte)
+            string nameToSet = "gdfgdfg";    // NAME (ASCII, max L_NAME)
+            int ageToSet = 44;               // AGE (numeric byte)
             int sexToSet = 0;                // SEX (numeric byte)
             float weightToSetF = 11.0f;            // WEIGHT as float32 LE
             float heightToSet = 181.2f;           // HEIGHT as float32 LE

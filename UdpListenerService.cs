@@ -16,9 +16,9 @@ public sealed class UdpListenerService : BackgroundService
     private readonly IKafkaProducer _producer;
     private readonly string _topic;
     private readonly int _port;
-    private readonly IDiscoveryRegistry _registry;
+    private readonly RegistryDevices _registry;
 
-    public UdpListenerService(ILogger<UdpListenerService> log, IKafkaProducer producer, IDiscoveryRegistry registry)
+    public UdpListenerService(ILogger<UdpListenerService> log, IKafkaProducer producer, RegistryDevices registry)
     {
         _log = log;
         _producer = producer;
@@ -73,7 +73,7 @@ public sealed class UdpListenerService : BackgroundService
                 // discovery registry (non-blocking)
                 var payload = buf.AsSpan(0, res.ReceivedBytes).ToArray();
                 // Update the instantiation of DiscoveredDevice to use an object initializer with all required parameters.
-                var devInfo = new DiscoveredDevice(
+                var devInfo = new RegisteredDevices(
                    address: remoteEp.ToString(),
                    port: remoteEp.Port,       
                    protocol: "UDP",

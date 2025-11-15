@@ -43,6 +43,21 @@ namespace Infision.MHCP
             await stream.WriteAsync(frame, ct).ConfigureAwait(false);
         }
 
+        public Task SendResponseAsync(NetworkStream stream, ProtocolHeader requestHeader, ReadOnlyMemory<byte> payload, CancellationToken ct = default)
+        {
+            var header = new ProtocolHeader
+            {
+                RouteId = requestHeader.RouteId,
+                MessageId = requestHeader.MessageId,
+                CategoryId = requestHeader.CategoryId,
+                RequestResponse = RequestResponseTypeEnum.Response,
+                SequenceNumber = requestHeader.SequenceNumber
+            }.ToByteArray();
+
+            var frame = MhcpWire.Build(header, payload.IsEmpty ? Array.Empty<byte>() : payload.ToArray());
+            return stream.WriteAsync(frame, ct).AsTask();
+        }
+
         private ReadOnlyMemory<byte> BuildPayload(int messageId)
         {
             _logger?.LogDebug("Sending request messageId={MessageId}", messageId);
