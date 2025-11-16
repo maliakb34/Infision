@@ -43,7 +43,8 @@ namespace Infision.Configure
     public class Kafka
     {
         public string Bootstrap { get; set; }
-        public string TopicRaw { get; set; }
+        public string UDPTopicRaw { get; set; }
+        public string TCPTopicRaw { get; set; }
         public string Folder { get; set; }
     }
     public class Root

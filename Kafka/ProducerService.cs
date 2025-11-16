@@ -13,11 +13,11 @@ namespace Infision.Kafka
         Task ProduceAsync(string topic, string key, string value, CancellationToken ct = default);
     }
 
-    public sealed class KafkaProducerService : IKafkaProducer, IDisposable
+    public sealed class ProducerService : IKafkaProducer, IDisposable
     {
         private readonly IProducer<string, string> _producer;
 
-        public KafkaProducerService()
+        public ProducerService()
         {
             var conf = new ProducerConfig
             {

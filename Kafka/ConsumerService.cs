@@ -3,18 +3,18 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-public sealed class KafkaConsumerService : BackgroundService
+public sealed class ConsumerService : BackgroundService
 {
-    private readonly ILogger<KafkaConsumerService> _log;
+    private readonly ILogger<ConsumerService> _log;
     private readonly string _topic;
     private readonly string _bootstrapServers;
     private readonly string _groupId = "udp-monitor-group";
 
-    public KafkaConsumerService(ILogger<KafkaConsumerService> log)
+    public ConsumerService(ILogger<ConsumerService> log)
     {
         _log = log;
         _bootstrapServers = Infision.Configure.RootSetting.Roots.AppSettings.Kafka.Bootstrap;
-        _topic = Infision.Configure.RootSetting.Roots.AppSettings.Kafka.TopicRaw;
+        _topic = Infision.Configure.RootSetting.Roots.AppSettings.Kafka.UDPTopicRaw;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)

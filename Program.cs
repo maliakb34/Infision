@@ -42,23 +42,23 @@ builder.Services.AddSingleton<TCPListener>();
 builder.Services.AddHostedService<TcpHostedService>();
 builder.Services.AddSingleton<PumpDataParser>();
 builder.Services.AddSingleton<PatientStationAnalyzer>();
+builder.Services.AddSingleton<UdpListener>();
 builder.Services.AddSingleton<UdpEventRequest>();
 builder.Services.AddSingleton<UdpEventResponse>();
 builder.Services.AddSingleton<UdpHeartbeatService>();
-builder.Services.AddSingleton<UdpListener>();
+
 builder.Services.AddHostedService<UdpHostedService>();
 
 
-//builder.Services.AddSingleton<IKafkaProducer, KafkaProducerService>();
+builder.Services.AddSingleton<IKafkaProducer, ProducerService>();
 
-//builder.Services.AddHostedService<KafkaConsumerService>();
-
-
+//builder.Services.AddHostedService<ConsumerService>();
 
 
 
 
-//builder.Services.AddHostedService<UdpListenerService>();
+
+
 //builder.Services.AddHostedService<Inticators>();
 
 
