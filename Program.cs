@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Data.Entity;
+using System.Linq;
 using System.Text.Json;
 
 
@@ -35,6 +36,25 @@ builder.Services.Configure<NetworkSettings>(opt =>
 {
     var src = RootSetting.Roots.AppSettings.NetworkSetting;
 
+});
+
+var allowedOrigins = new[]
+{
+      "http://localhost:5187",
+    "http://192.168.1.100:5000",
+    "http://localhost:5000",
+    RootSetting.Roots.AppSettings.NetworkSetting.HttpUrl?.TrimEnd('/')
+};
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SignalRCors", policy =>
+    {
+        policy.WithOrigins(allowedOrigins.Where(o => !string.IsNullOrWhiteSpace(o)).ToArray())
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 
 
@@ -90,8 +110,11 @@ var app = builder.Build();
 
 
 
+// Use CORS before mapping SignalR
+app.UseCors("SignalRCors");
+
 // SignalR Hub
-app.MapHub<MyHub>("/myhub");
+app.MapHub<MyHub>("/myhub").RequireCors("SignalRCors");
 
 // Quick test endpoint to push messages via SignalR groups.
 app.MapPost("/signalr/send", async (MyHubContext hubCtx, SignalRSendRequest request) =>

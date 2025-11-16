@@ -1,5 +1,4 @@
-﻿@await RenderSectionAsync("Scripts", required: false)
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
     Layout = null;
 }
@@ -596,5 +595,7 @@
 
     <!-- Page JS -->
     <script src="../../assets/js/dashboards-analytics.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
