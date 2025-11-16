@@ -26,7 +26,8 @@ namespace Infision.Configure
         public string BaseDomain { get; set; }
         public string CompanyName { get; set; }
         public ProxyServer ProxyServer { get; set; }
-        
+
+        public List<string> Departments { get; set; }
         public List<HubUser> HubUsers { get; set; }
 
 

@@ -1,15 +1,21 @@
-﻿using Infision;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿
+using Infision;
+using Infision.API.Endpoints;
+using Infision.Configure;
+using Infision.Data;
+using Infision.Data.Models;
 using Infision.Kafka;
 using Infision.MHCP;
 using Infision.MHCP.TCP;
 using Infision.MHCP.UDP;
-using Infision.Configure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.Data.Entity;
 using System.Text.Json;
-using Infision.API.Endpoints;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +28,7 @@ string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @".
 
 RootSetting.Roots = JsonSerializer.Deserialize<Root>(File.ReadAllText(projectRoot + "appsettings.json"));
 RootSetting.Roots.AppSettings.StoragePath = projectRoot;
+RootSetting.Roots.AppSettings.Departments = new DBContext().Departments.Select(p => p.name).ToList();
 
 
 
@@ -33,6 +40,8 @@ builder.Services.Configure<NetworkSettings>(opt =>
     var src = RootSetting.Roots.AppSettings.NetworkSetting;
 
 });
+
+
 
 builder.Services.AddSingleton<RegistryDevices>();
 builder.Services.AddSingleton<EventRequest>();

@@ -1,12 +1,13 @@
 ﻿
 
+using Infision.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
-namespace EF;
+namespace Infision;
 
-public partial class DBContext : DbContext
+public partial class DBContext : InfisionDbContext
 {
   
 
