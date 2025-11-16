@@ -9,14 +9,18 @@ namespace Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
         {
+            ViewData["SignalRBaseUrl"] = _configuration["Infision:SignalRBaseUrl"] ?? "http://localhost:5000";
+            ViewData["SignalRKey"] = _configuration["Infision:SignalRKey"] ?? "mhcp-udp-realtime-v1";
             return View();
         }
 

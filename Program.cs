@@ -5,6 +5,7 @@ using Infision.Configure;
 using Infision.Data;
 using Infision.Data.Models;
 using Infision.Kafka;
+using Infision.HubConfig;
 using Infision.MHCP;
 using Infision.MHCP.TCP;
 using Infision.MHCP.UDP;
@@ -93,12 +94,16 @@ var app = builder.Build();
 app.MapHub<MyHub>("/myhub");
 
 // Quick test endpoint to push messages via SignalR groups.
-app.MapPost("/signalr/send", async (MyHubContext hubCtx, string key, string message) =>
+app.MapPost("/signalr/send", async (MyHubContext hubCtx, SignalRSendRequest request) =>
 {
-    await hubCtx.SendData(key, message);
-    return Results.Ok(1);
-});
+    var key = string.IsNullOrWhiteSpace(request?.Key)
+        ? SignalRDefaults.UdpRealtimeKey
+        : request.Key.Trim();
+    var message = request?.Message ?? string.Empty;
 
+    await hubCtx.SendData(key, message);
+    return Results.Ok(new { delivered = true, key });
+});
 
 // SWAGGER MIDDLEWARE //
 app.UseSwagger(c =>
@@ -121,5 +126,7 @@ var optVal = Infision.Configure.RootSetting.Roots.AppSettings.NetworkSetting;
 app.Urls.Add(optVal.HttpUrl);
 
 await app.RunAsync();
+
+public record SignalRSendRequest(string Key, string Message);
 
 //Scaffold-DbContext "Host=localhost;Port=5432;Database=infisiondb;Username=appuser;Password=app123" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir "Data\Models" -ContextDir "Data" -Context "InfisionDbContext" -DataAnnotations -UseDatabaseNames -Schemas "public" -Force -Project Infision

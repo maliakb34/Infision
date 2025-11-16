@@ -24,6 +24,9 @@
                 <div>
                     <h5 class="mb-1">SignalR Mesaj Akışı</h5>
                     <small>Dinlenen anahtar: <code id="signalr-key-label"></code></small>
+                    <div class="text-muted">
+                        Hub URL: <code id="signalr-url-label"></code>
+                    </div>
                 </div>
                 <span class="badge bg-label-primary">Test</span>
             </div>
@@ -877,13 +880,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
     <script>
         (function () {
-            const SIGNALR_KEY = 'mhcp-udp-realtime-v1';
+            const SIGNALR_KEY = '@(ViewData["SignalRKey"] ?? "mhcp-udp-realtime-v1")';
+            const SIGNALR_BASE_URL = '@(ViewData["SignalRBaseUrl"] ?? "http://localhost:5000")';
+            const HUB_URL = `${SIGNALR_BASE_URL.replace(/\/$/, '')}/myhub`;
+
             const keyLabel = document.getElementById('signalr-key-label');
+            const urlLabel = document.getElementById('signalr-url-label');
             const logArea = document.getElementById('signalr-message-log');
             if (keyLabel) keyLabel.textContent = SIGNALR_KEY;
+            if (urlLabel) urlLabel.textContent = HUB_URL;
 
             const connection = new signalR.HubConnectionBuilder()
-                .withUrl('/myhub')
+                .withUrl(HUB_URL)
                 .withAutomaticReconnect()
                 .build();
 
