@@ -25,6 +25,7 @@
 <ItemGroup>
   <Compile Remove="HP60.cs" />
   <Compile Remove="MhcpPacketBuilder.cs" />
+  <Compile Remove="MP60.cs" />
   <Compile Remove="MP60RealTimeData.cs" />
   <Compile Remove="Properties\AssemblyInfo.cs" />
 </ItemGroup>
@@ -49,6 +50,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\Models\" />
   </ItemGroup>
 
 </Project>

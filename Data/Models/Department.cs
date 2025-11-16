@@ -6,32 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infision.Data.Models;
 
-[Table("Hospital")]
-public partial class Hospital
+public partial class Department
 {
     [Key]
     public int id { get; set; }
 
-    [StringLength(500)]
+    [StringLength(250)]
     public string? name { get; set; }
 
-    [Column(TypeName = "timestamp without time zone")]
-    public DateTime? recorddate { get; set; }
-
-    [StringLength(500)]
+    [StringLength(250)]
     public string? title { get; set; }
 
     public int? status { get; set; }
 
-    [StringLength(500)]
-    public string? apiurl { get; set; }
+    [StringLength(50)]
+    public string? phone { get; set; }
 
-    [StringLength(500)]
-    public string? systemurl { get; set; }
-
-    [StringLength(500)]
+    [StringLength(350)]
     public string? email { get; set; }
-
-    [StringLength(500)]
-    public string? url { get; set; }
 }

@@ -111,4 +111,4 @@ app.Urls.Add(optVal.HttpUrl);
 
 await app.RunAsync();
 
-//Scaffold - DbContext "Host=localhost;Port=5432;Database=infisiondb;Username=appuser;Password=app123" Npgsql.EntityFrameworkCore.PostgreSQL - OutputDir "EF\Models" - ContextDir "EF" - Context "InfisionDbContext" - DataAnnotations - UseDatabaseNames - Schemas "public" - Force - Project Infision
+//Scaffold-DbContext "Host=localhost;Port=5432;Database=infisiondb;Username=appuser;Password=app123" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir "Data\Models" -ContextDir "Data" -Context "InfisionDbContext" -DataAnnotations -UseDatabaseNames -Schemas "public" -Force -Project Infision

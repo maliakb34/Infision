@@ -16,6 +16,8 @@ public partial class InfisionDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Department> Departments { get; set; }
+
     public virtual DbSet<Hospital> Hospitals { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -26,18 +28,23 @@ public partial class InfisionDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Department>(entity =>
+        {
+            entity.HasKey(e => e.id).HasName("departments_pkey");
+
+            entity.Property(e => e.id).HasDefaultValueSql("nextval('departments_id_seq'::regclass)");
+        });
+
         modelBuilder.Entity<Hospital>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("Hospital_pkey");
+            entity.HasKey(e => e.id).HasName("hospital_pkey");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.id).HasDefaultValueSql("nextval('hospital_id_seq'::regclass)");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("Users_pkey");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.HasKey(e => e.id).HasName("User_pkey");
         });
 
         OnModelCreatingPartial(modelBuilder);
