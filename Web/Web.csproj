@@ -10,4 +10,9 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\libs\iconify\" />
+    <Folder Include="wwwroot\libs\test\" />
+  </ItemGroup>
+
 </Project>
