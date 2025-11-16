@@ -9,6 +9,7 @@ using Infision.MHCP;
 using Infision.MHCP.TCP;
 using Infision.MHCP.UDP;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,13 +20,7 @@ using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-
-
 string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\"));
-
-
 RootSetting.Roots = JsonSerializer.Deserialize<Root>(File.ReadAllText(projectRoot + "appsettings.json"));
 RootSetting.Roots.AppSettings.StoragePath = projectRoot;
 RootSetting.Roots.AppSettings.Departments = new DBContext().Departments.Select(p => p.name).ToList();
@@ -96,6 +91,13 @@ var app = builder.Build();
 
 // SignalR Hub
 app.MapHub<MyHub>("/myhub");
+
+// Quick test endpoint to push messages via SignalR groups.
+app.MapPost("/signalr/send", async (MyHubContext hubCtx, string key, string message) =>
+{
+    await hubCtx.SendData(key, message);
+    return Results.Ok(1);
+});
 
 
 // SWAGGER MIDDLEWARE //

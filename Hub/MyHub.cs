@@ -1,4 +1,4 @@
-﻿
+﻿using Infision.HubConfig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -20,34 +20,26 @@ namespace Infision
             try
             {
                 String id = Context.ConnectionId;
-                List<Configure.HubUser> hubUsers = new List<Configure.HubUser>();
-                 
-                hubUsers = Configure.RootSetting.Roots.AppSettings.HubUsers;
-                if (hubUsers != null)
+                List<Configure.HubUser> hubUsers = Configure.RootSetting.Roots.AppSettings.HubUsers ?? new List<Configure.HubUser>();
+
+                var search_hubUsers = hubUsers.Where(P => P.ConnectionID == id).ToList();
+                foreach (var hubUser in search_hubUsers)
+                {
+                    if (!string.IsNullOrWhiteSpace(hubUser.SignalRKey))
                     {
-                        List<Configure.HubUser> search_hubUsers = hubUsers.Where(P => P.ConnectionID == id).ToList();
-                        if (search_hubUsers != null)
-                        {
-                            if (search_hubUsers.Count() > 0)
-                            {
-                                foreach (var item2 in search_hubUsers)
-                                {
-                                    if (hubUsers.Where(P => P == item2).Count() > 0)
-                                    {
-                                        hubUsers.Remove(item2);
-                                    }
-                                }
-                            Configure.RootSetting.Roots.AppSettings.HubUsers= hubUsers;
-                            }
-                        }
+                        await Groups.RemoveFromGroupAsync(id, hubUser.SignalRKey);
                     }
-                
+                    hubUsers.Remove(hubUser);
+                }
+
+                Configure.RootSetting.Roots.AppSettings.HubUsers = hubUsers;
             }
             catch (Exception ex)
             {
                  
             }
 
+            await base.OnDisconnectedAsync(exception);
         }
 
 
@@ -98,12 +90,14 @@ namespace Infision
         #region Data Members
         #endregion
         #region Methods
-        public async Task<string> Connect(int userid,int companyid)
+        public async Task<string> Connect(int userid,int companyid,string signalrKey)
         {
             string id = "";
             try
             {
                 id = Context.ConnectionId;
+                string normalizedKey = NormalizeSignalRKey(signalrKey);
+                await Groups.AddToGroupAsync(id, normalizedKey);
                 {
                      
                     List<Configure.HubUser> hubUsers = Configure.RootSetting.Roots.AppSettings.HubUsers;
@@ -126,7 +120,7 @@ namespace Infision
                             }
                         }
                     }
-                    UpdateHubUser(new Configure.HubUser() { UserID=userid,CompanyID =companyid,ConnectionID=id});
+                    UpdateHubUser(new Configure.HubUser() { UserID=userid,CompanyID =companyid,ConnectionID=id,SignalRKey=normalizedKey});
                      
                 }
 
@@ -141,23 +135,10 @@ namespace Infision
 
         
 
-        public async void SendData(int companyID,string messagingData)
+        public async Task SendData(string signalrKey,string messagingData)
         {
-
-
-                string fromUserId = Context.ConnectionId;
-                 
-                List<Configure.HubUser> users = Configure.RootSetting.Roots.AppSettings.HubUsers;
-
-                users = users.Where(P => P.CompanyID == companyID).ToList();
-                    if (users != null)
-                        foreach (var item in users)
-                        {
-                            Clients.Client(item.ConnectionID).SendAsync("ReceiveMessage",  messagingData);
-                        }
-                 
-                 
-             
+            string normalizedKey = NormalizeSignalRKey(signalrKey);
+            await Clients.Group(normalizedKey).SendAsync("ReceiveMessage",  messagingData);
         }
 
        
@@ -171,6 +152,13 @@ namespace Infision
         #endregion
 
         #region private Messages
+
+        private static string NormalizeSignalRKey(string signalrKey)
+        {
+            return string.IsNullOrWhiteSpace(signalrKey)
+                ? SignalRDefaults.UdpRealtimeKey
+                : signalrKey.Trim();
+        }
 
         private void AddMessageinCache(string userName, string message)
         {

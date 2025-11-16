@@ -1,4 +1,4 @@
-﻿
+﻿using Infision.HubConfig;
 using Microsoft.AspNetCore.SignalR;
 
 
@@ -18,10 +18,12 @@ namespace Infision
             _hubContext = hubContext;
         }
 
-        public async Task SendData(string user, string messagingData)
+        public async Task SendData(string signalrKey, string messagingData)
         {
-
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", "user", messagingData);
+            string normalizedKey = string.IsNullOrWhiteSpace(signalrKey)
+                ? SignalRDefaults.UdpRealtimeKey
+                : signalrKey.Trim();
+            await _hubContext.Clients.Group(normalizedKey).SendAsync("ReceiveMessage", messagingData);
 
         }
     }

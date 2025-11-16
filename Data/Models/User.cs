@@ -52,5 +52,6 @@ public partial class User
     [Column(TypeName = "timestamp without time zone")]
     public DateTime? logoutdate { get; set; }
 
-    public int? pushclientid { get; set; }
+    [StringLength(64)]
+    public string? pushclientid { get; set; }
 }

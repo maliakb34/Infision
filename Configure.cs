@@ -12,6 +12,7 @@ namespace Infision.Configure
         public int UserID { get; set; }
         public int CompanyID { get; set; }
         public string ConnectionID { get; set; }
+        public string? SignalRKey { get; set; }
     }
 
     public class AppSettings
