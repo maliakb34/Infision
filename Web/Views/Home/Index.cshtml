@@ -16,8 +16,20 @@
             <h5 class="mb-1">SignalR Test Bloğu</h5>
             <p class="mb-0">
                 Kullanıcıya tanımladığın <code>signalrid</code> anahtarıyla SignalR bağlantısını başlat.
-                Bu blok, mesajların UI'da görüneceği alan için örnek placeholder olarak bırakıldı.
+                Aşağıdaki kart şu an <strong>mhcp-udp-realtime-v1</strong> anahtarını dinliyor; SQL tarafını hazır edene kadar test edebilirsin.
             </p>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">SignalR Mesaj Akışı</h5>
+                    <small>Dinlenen anahtar: <code id="signalr-key-label"></code></small>
+                </div>
+                <span class="badge bg-label-primary">Test</span>
+            </div>
+            <div class="card-body">
+                <pre class="bg-light p-3 rounded" id="signalr-message-log" style="min-height: 140px;">Mesaj bekleniyor...</pre>
+            </div>
         </div>
         <div class="row">
             <!-- Website Analytics -->
@@ -860,3 +872,36 @@
     <div class="content-backdrop fade"></div>
 </div>
 <!-- Content wrapper -->
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+    <script>
+        (function () {
+            const SIGNALR_KEY = 'mhcp-udp-realtime-v1';
+            const keyLabel = document.getElementById('signalr-key-label');
+            const logArea = document.getElementById('signalr-message-log');
+            if (keyLabel) keyLabel.textContent = SIGNALR_KEY;
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl('/myhub')
+                .withAutomaticReconnect()
+                .build();
+
+            const appendMessage = (message) => {
+                if (!logArea) return;
+                const timestamp = new Date().toLocaleTimeString();
+                logArea.textContent = `[${timestamp}] ${message}\n` + logArea.textContent;
+            };
+
+            connection.on('ReceiveMessage', (data) => appendMessage(data));
+            connection.on('UpdateConnectionID', (connectionId) => appendMessage(`Yeni ConnectionId: ${connectionId}`));
+            connection.onclose(error => appendMessage(`Bağlantı kapandı: ${error?.message ?? 'bilinmiyor'}`));
+
+            connection.start()
+                .then(() => appendMessage('SignalR bağlantısı kuruldu.'))
+                .then(() => connection.invoke('Connect', 1, 1, SIGNALR_KEY))
+                .then(() => appendMessage(`Connect çağrısı gönderildi (key=${SIGNALR_KEY}).`))
+                .catch(err => appendMessage(`SignalR hata: ${err?.message ?? err}`));
+        })();
+    </script>
+}
