@@ -880,8 +880,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
     <script>
         (function () {
-            const SIGNALR_KEY = '@(ViewData["SignalRKey"] ?? "mhcp-udp-realtime-v1")';
-            const SIGNALR_BASE_URL = '@(ViewData["SignalRBaseUrl"] ?? "http://localhost:5000")';
+            const SIGNALR_KEY = 'mhcp-udp-realtime-v1';
+            const SIGNALR_BASE_URL = 'http://192.168.1.100:5000';
             const HUB_URL = `${SIGNALR_BASE_URL.replace(/\/$/, '')}/myhub`;
 
             const keyLabel = document.getElementById('signalr-key-label');
