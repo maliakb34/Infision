@@ -18,6 +18,8 @@ public partial class InfisionDbContext : DbContext
 
     public virtual DbSet<Department> Departments { get; set; }
 
+    public virtual DbSet<Device> Devices { get; set; }
+
     public virtual DbSet<Hospital> Hospitals { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -33,6 +35,13 @@ public partial class InfisionDbContext : DbContext
             entity.HasKey(e => e.id).HasName("departments_pkey");
 
             entity.Property(e => e.id).HasDefaultValueSql("nextval('departments_id_seq'::regclass)");
+        });
+
+        modelBuilder.Entity<Device>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("Devices_pkey");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<Hospital>(entity =>
